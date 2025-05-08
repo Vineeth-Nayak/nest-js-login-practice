@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   UseGuards,
   UsePipes,
@@ -19,5 +20,11 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   getUser(@Query() queryParams: UserQueryDTO) {
     return this.userService.getUser(queryParams);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  getUserById(@Param('id') id: string) {
+    return this.userService.getUserId(id);
   }
 }

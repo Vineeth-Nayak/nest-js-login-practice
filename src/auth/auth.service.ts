@@ -49,15 +49,42 @@ export class AuthService {
 
     const result = await bcrypt.compare(password, existingEmail.password);
     if (result) {
-      const accessToken = await this.generateJWT(existingEmail._id.toString());
-      return { message: 'logged in', data: { accessToken } };
+      const { accessToken, refreshToken } = await this.generateJWT(
+        existingEmail._id.toString(),
+      );
+
+      return { message: 'logged in', data: { accessToken, refreshToken } };
     }
 
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  async generateJWT(userId: string) {
+  // helper function to generateJWT
+  async generateJWT(userId: string, needBoth = true) {
     const accessToken = this.jwtService.sign({ userId });
-    return accessToken;
+
+    if (!needBoth) return { accessToken };
+    const refreshToken = this.jwtService.sign({ userId }, { expiresIn: '7d' });
+
+    return { accessToken, refreshToken };
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      const user = await this.userModel.findById(payload.userId);
+
+      if (!user) throw new UnauthorizedException();
+
+      // const newAccessToken = this.jwtService.sign({ userId: user._id });
+      const { accessToken } = await this.generateJWT(
+        user._id.toString(),
+        false,
+      );
+
+      return { accessToken };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }
