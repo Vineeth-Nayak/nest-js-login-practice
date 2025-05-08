@@ -7,8 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 
-import { AppConfigModule } from './config'; // from your config/index.ts
-import { DatabaseModule } from './database/database';
+import { AppConfigModule } from './config';
+// import { DatabaseModule } from './database/database';
+import { DatabaseModule } from './database/database.module';
+import { UserPrismaModule } from './user_prisma/user_prisma.module';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { DatabaseModule } from './database/database';
     }),
     UserModule,
     AuthModule,
+    UserPrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
