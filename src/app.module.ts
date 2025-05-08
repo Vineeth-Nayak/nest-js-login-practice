@@ -8,17 +8,19 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 
 import { AppConfigModule } from './config'; // from your config/index.ts
+import { DatabaseModule } from './database/database';
 
 @Module({
   imports: [
     AppConfigModule, // loads env vars with validation
-    MongooseModule.forRootAsync({
-      imports: [AppConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('mongoUri'),
-      }),
-      inject: [ConfigService],
-    }),
+    // MongooseModule.forRootAsync({
+    //   imports: [AppConfigModule],
+    //   useFactory: (configService: ConfigService) => ({
+    //     uri: configService.get<string>('mongoUri'),
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    DatabaseModule,
     JwtModule.registerAsync({
       imports: [AppConfigModule],
       global: true,
