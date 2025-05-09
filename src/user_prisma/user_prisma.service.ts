@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from 'generated/prisma';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -23,25 +27,76 @@ export class UserPrismaService {
       });
       return user;
     } catch (error) {
-      if (error.statusCode) throw new Error(error);
+      if (error instanceof BadRequestException) throw error;
       console.log('error from create prisma user', error);
       throw new BadRequestException('An error occured during creation of user');
     }
   }
 
   async findAll(role?: 'user' | 'admin') {
-    if (role) {
-      return this.databaseService.user.findMany({ where: { role } });
-    }
-    return this.databaseService.user.findMany({ where: { role } });
+    const where = role ? { role } : {};
+    return this.databaseService.user.findMany({ where });
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} userPrisma`;
+    try {
+      const user = await this.databaseService.user.findUnique({
+        where: { id },
+      });
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+
+      console.error('Unexpected error in findOne:', error);
+      throw new BadRequestException('Failed to fetch user');
+    }
   }
 
   async update(id: number, updateUserPrismaDto: Prisma.UserUpdateInput) {
-    return `This action updates a #${id} userPrisma`;
+    try {
+      const existingUser = await this.databaseService.user.findUnique({
+        where: { id },
+      });
+      if (!existingUser) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      // Check if email is being changed to one that already exists
+      if (updateUserPrismaDto.email) {
+        const emailExists = await this.databaseService.user.findFirst({
+          where: {
+            email: updateUserPrismaDto.email as string,
+            NOT: { id },
+          },
+        });
+
+        if (emailExists) {
+          throw new BadRequestException(
+            `Email "${updateUserPrismaDto.email}" is already in use`,
+          );
+        }
+      }
+
+      const updatedUser = await this.databaseService.user.update({
+        where: { id },
+        data: updateUserPrismaDto,
+      });
+
+      return updatedUser;
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+
+      console.error('Unexpected error in update:', error);
+      throw new BadRequestException('Failed to update user');
+    }
   }
 
   async remove(id: number) {
