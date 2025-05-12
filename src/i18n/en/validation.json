@@ -1,6 +1,12 @@
 {
-  "email_required": "Email is required",
-  "email_invalid": "Invalid email format",
   "field_is_required": "{{field}} is required",
-  "invalid_format": "Invalid {{field}} format"
+  "invalid_format": "Invalid {{field}} format",
+  "validation": {
+    "field_is_required": "{{field}} is required",
+    "invalid_format": "Invalid {{field}} format"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password"
+  }
 }

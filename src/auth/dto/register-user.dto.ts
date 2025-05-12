@@ -9,10 +9,10 @@ export class RegisterUserDTO {
   @IsString()
   displayName: string;
 
-  @IsString()
   // @IsEmail({}, { message: 'Invalid email address' })
-  @IsEmail({}, { message: 'invalid_format', context: { field: 'Email' } })
-  @IsNotEmpty({ message: 'field_is_required', context: { field: 'Email' } })
+  @IsEmail({}, { message: 'invalid_format', context: { field: 'email' } })
+  @IsNotEmpty({ message: 'field_is_required', context: { field: 'email' } })
+  @IsString()
   email: string;
 
   @IsNotEmpty()

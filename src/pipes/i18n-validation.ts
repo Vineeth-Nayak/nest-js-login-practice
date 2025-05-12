@@ -4,10 +4,9 @@ import {
   Injectable,
   PipeTransform,
 } from '@nestjs/common';
-import { validate } from 'class-validator';
+import { validate, ValidationError } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { I18nService } from 'nestjs-i18n';
-import { ValidationError } from 'class-validator';
 
 @Injectable()
 export class I18nValidationPipe implements PipeTransform {
@@ -36,16 +35,28 @@ export class I18nValidationPipe implements PipeTransform {
       // Get the context if it exists
       const context = (error.contexts || {})[firstConstraintKey];
 
-      // Translate the message
+      // Translate the validation message
       let translated = await this.i18n.translate(
         `validation.${firstConstraint}`,
       );
 
-      // Replace placeholders with context values
-      if (context) {
-        for (const [key, value] of Object.entries(context)) {
-          translated = translated.replace(`{{${key}}}`, value as string);
+      // Translate the field if context.field exists
+      let translatedField = '';
+      if (context && context.field) {
+        translatedField = await this.i18n.translate(
+          `fields.${context.field.toLowerCase()}`,
+        );
+
+        if (
+          translatedField.length > 0 &&
+          !translatedField.startsWith('validation.fields')
+        ) {
+          translated = translated.replace(`{{field}}`, translatedField);
         }
+      }
+
+      if (translated.startsWith('validation.')) {
+        translated = translated.replace(`validation.`, '');
       }
 
       return translated;
