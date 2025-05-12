@@ -4,24 +4,17 @@ import { AppService } from './app.service';
 import { UserModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 
 import { AppConfigModule } from './config';
 // import { DatabaseModule } from './database/database';
 import { DatabaseModule } from './database/database.module';
 import { UserPrismaModule } from './user_prisma/user_prisma.module';
+import { AppI18nModule } from './i18n/i18n.module';
 
 @Module({
   imports: [
     AppConfigModule, // loads env vars with validation
-    // MongooseModule.forRootAsync({
-    //   imports: [AppConfigModule],
-    //   useFactory: (configService: ConfigService) => ({
-    //     uri: configService.get<string>('mongoUri'),
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     DatabaseModule,
     JwtModule.registerAsync({
       imports: [AppConfigModule],
@@ -36,6 +29,8 @@ import { UserPrismaModule } from './user_prisma/user_prisma.module';
     UserModule,
     AuthModule,
     UserPrismaModule,
+
+    AppI18nModule,
   ],
   controllers: [AppController],
   providers: [AppService],

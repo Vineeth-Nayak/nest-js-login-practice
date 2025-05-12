@@ -1,0 +1,6 @@
+{
+  "email_required": "Email is required",
+  "email_invalid": "Invalid email format",
+  "field_is_required": "{{field}} is required",
+  "invalid_format": "Invalid {{field}} format"
+}

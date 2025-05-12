@@ -1,0 +1,6 @@
+{
+  "email_required": "البريد الإلكتروني مطلوب",
+  "email_invalid": "تنسيق البريد الإلكتروني غير صالح",
+  "field_is_required": "{{field}} مطلوب",
+  "invalid_format": "تنسيق {{field}} غير صالح"
+}
