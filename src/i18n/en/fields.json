@@ -1,4 +1,6 @@
 {
     "email": "Email Address",
-    "pasword": "Password"
+    "password": "Password",
+    "display_name": "Name",
+    "user_name": "UserName"
 }

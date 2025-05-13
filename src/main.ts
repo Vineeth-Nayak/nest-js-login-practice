@@ -10,10 +10,17 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const i18n = app.get<I18nService<Record<string, unknown>>>(I18nService);
 
-  app.useGlobalPipes(new I18nValidationPipe(i18n));
+  app.useGlobalPipes(
+    new I18nValidationPipe(i18n),
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   app.useGlobalFilters(new HTTPExceptionsFilter());
-  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

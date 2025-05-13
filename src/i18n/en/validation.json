@@ -1,12 +1,7 @@
 {
   "field_is_required": "{{field}} is required",
   "invalid_format": "Invalid {{field}} format",
-  "validation": {
-    "field_is_required": "{{field}} is required",
-    "invalid_format": "Invalid {{field}} format"
-  },
-  "fields": {
-    "email": "Email",
-    "password": "Password"
-  }
+  "is_string": "{{field}} must be a string",
+  "validation_error": "An error occured",
+  "minLength": "{{field}} must be at least 8 characters long"
 }

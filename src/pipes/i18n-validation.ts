@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { validate, ValidationError } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { I18nService } from 'nestjs-i18n';
+import { I18nService, I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class I18nValidationPipe implements PipeTransform {
@@ -31,42 +31,54 @@ export class I18nValidationPipe implements PipeTransform {
     if (error.constraints) {
       const firstConstraintKey = Object.keys(error.constraints)[0];
       const firstConstraint = error.constraints[firstConstraintKey];
-
-      // Get the context if it exists
       const context = (error.contexts || {})[firstConstraintKey];
 
-      // Translate the validation message
-      let translated = await this.i18n.translate(
-        `validation.${firstConstraint}`,
-      );
+      const lang = I18nContext.current()?.lang;
 
-      // Translate the field if context.field exists
-      let translatedField = '';
-      if (context && context.field) {
-        translatedField = await this.i18n.translate(
-          `fields.${context.field.toLowerCase()}`,
+      let translatedField = context?.field || '';
+      if (translatedField) {
+        const translated = await this.i18n.translate(
+          `fields.${translatedField.toLowerCase()}`,
+          {
+            lang,
+            defaultValue: translatedField,
+          },
         );
 
         if (
-          translatedField.length > 0 &&
-          !translatedField.startsWith('validation.fields')
+          translated &&
+          translated !== `fields.${translatedField.toLowerCase()}`
         ) {
-          translated = translated.replace(`{{field}}`, translatedField);
+          translatedField = translated;
         }
       }
 
-      if (translated.startsWith('validation.')) {
-        translated = translated.replace(`validation.`, '');
-      }
+      let translatedMessage = await this.i18n.translate(
+        `validation.${firstConstraint}`,
+        {
+          lang,
+          defaultValue: firstConstraint,
+        },
+      );
 
-      return translated;
+      translatedMessage = translatedMessage.replace(
+        '{{field}}',
+        translatedField,
+      );
+
+      return translatedMessage;
     }
 
     if (error.children && error.children.length > 0) {
       return this.getFirstError(error.children[0]);
     }
 
-    return await this.i18n.translate('validation.validation_error');
+    const lang = I18nContext.current()?.lang;
+
+    return await this.i18n.translate('validation.validation_error', {
+      lang,
+      defaultValue: 'Validation error',
+    });
   }
 
   private toValidate(meta: Function): boolean {

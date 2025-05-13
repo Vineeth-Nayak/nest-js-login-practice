@@ -1,12 +1,7 @@
 {
   "field_is_required": "مطلوب {{field}}",
   "invalid_format": "تنسيق {{field}} غير صالح",
-  "validation": {
-    "field_is_required": "مطلوب {{field}}",
-    "invalid_format": "تنسيق {{field}} غير صالح"
-  },
-  "fields": {
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور"
-  }
+  "is_string": "يجب أن يكون {{field}} سلسلة",
+  "validation_error": "An error occured",
+  "minLength": "يجب أن يكون طول {{field}} 8 أحرف على الأقل"
 }
